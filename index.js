@@ -10,10 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Koneksi ke MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log("MongoDB Connected"))
+mongoose.connect(process.env.MONGO_URI).then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
 
 // Schema untuk menyimpan informasi file
@@ -23,7 +20,7 @@ const FileSchema = new mongoose.Schema({
   mimetype: String,
   size: Number,
 });
-const File = mongoose.model("File", FileSchema);
+module.exports = mongoose.models.File || mongoose.model("File", FileSchema);
 
 // Konfigurasi Multer (Folder penyimpanan)
 const storage = multer.diskStorage({
@@ -54,6 +51,10 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 app.get("/files", async (req, res) => {
   const files = await File.find();
   res.json(files);
+});
+
+app.get("/", (req, res) => {
+  res.send("Hello, Vercel!");
 });
 
 // Route untuk akses file statis
